@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+    web:
+        build:
+            context: ./images/snipeit
+            args:
+                - SNIPEIT_VERSION=${SNIPEIT_VERSION}
+        image: ianharrier/snipeit:${SNIPEIT_VERSION}
+        restart: unless-stopped
+        ports:
+            - ${WEB_PORT}:80
+        environment:
+            - APP_ENV=production
+            - APP_DEBUG=false
+            - APP_URL=${APP_URL}
+            - APP_TIMEZONE=${APP_TIMEZONE}
+            - APP_LOCALE=${APP_LOCALE}
+            - DB_HOST=db
+            - DB_DATABASE=${MYSQL_DATABASE}
+            - DB_USERNAME=${MYSQL_USER}
+            - DB_PASSWORD=${MYSQL_PASSWORD}
+            - MAIL_HOST=${MAIL_HOST}
+            - MAIL_PORT=${MAIL_PORT}
+            - MAIL_FROM_ADDR=${MAIL_FROM_ADDR}
+            - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+        volumes:
+            - ./volumes/web/private_secrets:/srv/www/app/storage/private_secrets
+    db:
+        image: mysql
+        restart: unless-stopped
+        environment:
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        volumes:
+            - ./volumes/db/data:/var/lib/mysql

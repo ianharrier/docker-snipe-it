@@ -1,0 +1,3 @@
+volumes/db/data
+volumes/web/private_secrets
+.env
