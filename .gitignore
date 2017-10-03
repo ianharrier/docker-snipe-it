@@ -1,3 +1,5 @@
+backups
 volumes/db/data
-volumes/web/private_secrets
+volumes/web/data
 .env
+.env.bak

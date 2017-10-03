@@ -13,26 +13,70 @@ services:
         environment:
             - APP_ENV=production
             - APP_DEBUG=false
-            - APP_URL=${APP_URL}
-            - APP_TIMEZONE=${APP_TIMEZONE}
-            - APP_LOCALE=${APP_LOCALE}
+            - APP_URL=${WEB_APP_URL}
+            - APP_TIMEZONE=${TIMEZONE}
+            - APP_LOCALE=${WEB_APP_LOCALE}
+            - DB_CONNECTION=mysql
             - DB_HOST=db
-            - DB_DATABASE=${MYSQL_DATABASE}
-            - DB_USERNAME=${MYSQL_USER}
-            - DB_PASSWORD=${MYSQL_PASSWORD}
-            - MAIL_HOST=${MAIL_HOST}
-            - MAIL_PORT=${MAIL_PORT}
-            - MAIL_FROM_ADDR=${MAIL_FROM_ADDR}
-            - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+            - DB_DATABASE=${DB_MYSQL_DATABASE}
+            - DB_USERNAME=${DB_MYSQL_USER}
+            - DB_PASSWORD=${DB_MYSQL_PASSWORD}
+            - MAIL_DRIVER=smtp
+            - MAIL_HOST=${WEB_MAIL_HOST}
+            - MAIL_PORT=${WEB_MAIL_PORT}
+            - MAIL_USERNAME=${WEB_MAIL_USERNAME}
+            - MAIL_PASSWORD=${WEB_MAIL_PASSWORD}
+            - MAIL_ENCRYPTION=${WEB_MAIL_ENCRYPTION}
+            - MAIL_FROM_ADDR=${WEB_MAIL_FROM_ADDR}
+            - MAIL_FROM_NAME=${WEB_MAIL_FROM_NAME}
+            - MAIL_REPLYTO_ADDR=${WEB_MAIL_REPLYTO_ADDR}
+            - MAIL_REPLYTO_NAME=${WEB_MAIL_REPLYTO_NAME}
+            - IMAGE_LIB=gd
+            - APP_TRUSTED_PROXIES=${WEB_APP_TRUSTED_PROXIES}
         volumes:
-            - ./volumes/web/private_secrets:/srv/www/app/storage/private_secrets
+            - ./volumes/web/data:/var/lib/snipeit
     db:
         image: mysql
         restart: unless-stopped
         environment:
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-            - MYSQL_USER=${MYSQL_USER}
-            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${DB_MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${DB_MYSQL_DATABASE}
+            - MYSQL_USER=${DB_MYSQL_USER}
+            - MYSQL_PASSWORD=${DB_MYSQL_PASSWORD}
         volumes:
             - ./volumes/db/data:/var/lib/mysql
+    scheduler:
+        build:
+            context: ./images/scheduler
+            args:
+                - GLIBC_VERSION=2.25-r0
+                - COMPOSE_VERSION=1.15.0
+        image: ianharrier/snipeit-scheduler:1.0.7
+        restart: unless-stopped
+        environment:
+            - LDAP_SYNC_OPERATION=${WEB_LDAP_SYNC_OPERATION}
+            - LDAP_SYNC_CRON_EXP=${WEB_LDAP_SYNC_CRON_EXP}
+            - HOST_PATH=${PWD}
+            - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+            - TIMEZONE=${TIMEZONE}
+        volumes:
+            - ./:${PWD}
+            - /var/run/docker.sock:/var/run/docker.sock
+    backup:
+        build:
+            context: ./images/backup
+            args:
+                - GLIBC_VERSION=2.25-r0
+                - COMPOSE_VERSION=1.15.0
+        image: ianharrier/snipeit-backup:1.0.7
+        restart: unless-stopped
+        environment:
+            - OPERATION=${BACKUP_OPERATION}
+            - CRON_EXP=${BACKUP_CRON_EXP}
+            - RETENTION=${BACKUP_RETENTION}
+            - HOST_PATH=${PWD}
+            - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+            - TIMEZONE=${TIMEZONE}
+        volumes:
+            - ./:${PWD}
+            - /var/run/docker.sock:/var/run/docker.sock

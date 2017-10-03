@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.6
 
 MAINTAINER Ian Harrier <github@harrier.us>
 
@@ -24,9 +24,11 @@ RUN set -ex \
         && apk --no-cache add \
                php7-apache2 \
                php7 \
+               php7-bcmath \
                php7-ctype \
                php7-curl \
                php7-dom \
+               php7-fileinfo \
                php7-gd \
                php7-json \
                php7-ldap \
@@ -37,6 +39,9 @@ RUN set -ex \
                php7-pdo_mysql \
                php7-phar \
                php7-session \
+               php7-tokenizer \
+               php7-simplexml \
+               php7-xml \
                php7-zip \
                php7-zlib \
         && sed -i 's/^expose_php = .*/expose_php = Off/g' /etc/php7/php.ini \
@@ -49,7 +54,6 @@ RUN set -ex \
 RUN set -ex \
         && apk --no-cache add \
                curl \
-        && ln -s /usr/bin/php7 /usr/bin/php \
         && curl --location --retry 3 \
                https://getcomposer.org/installer \
              | php -- --install-dir=/usr/local/bin --filename=composer \
@@ -66,6 +70,7 @@ WORKDIR /srv/www/app
 
 RUN set -ex \
         && apk --no-cache add \
+               ca-certificates \
                curl \
                tar \
         && curl --location --retry 3 \
@@ -75,10 +80,18 @@ RUN set -ex \
         && sed -i 's/^#LoadModule rewrite_module /LoadModule rewrite_module /g' /etc/apache2/httpd.conf \
         && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/httpd.conf \
         && sed -i 's/^allow_url_include = .*/allow_url_include = On/g' /etc/php7/php.ini \
+        && echo "TLS_CACERT /etc/ssl/certs/ca-certificates.crt" >> /etc/openldap/ldap.conf \
         && composer install --no-dev \
-        && chgrp -R apache storage public/uploads \
-        && chmod -R ug+rwx storage public/uploads \
-        && touch .env \
+        && rm -rf /root/.composer/cache \
+        && mkdir -p /var/lib/snipeit/private_uploads \
+        && rm -rf ./storage/private_uploads \
+        && ln -sf /var/lib/snipeit/private_uploads ./storage/private_uploads \
+        && mkdir -p /var/lib/snipeit/uploads \
+        && rm -rf ./public/uploads \
+        && ln -sf /var/lib/snipeit/uploads ./public/uploads \
+        && chgrp -R apache storage /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads \
+        && chmod -R ug+rwx storage /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads \
+        && cp .env.example .env \
         && apk --no-cache del \
                curl \
                tar
