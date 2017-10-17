@@ -29,6 +29,12 @@ NEW_SNIPEIT_VERSION=$(grep ^SNIPEIT_VERSION= .env.template | cut -d = -f 2)
 echo "[I] Upgrading Snipe-IT from '$OLD_SNIPEIT_VERSION' to '$NEW_SNIPEIT_VERSION'."
 sed -i.bak "s/^SNIPEIT_VERSION=.*/SNIPEIT_VERSION=$NEW_SNIPEIT_VERSION/g" .env
 
+echo "=== Deleting old images. ======================================================="
+IMAGE_BACKUP=$(docker images ianharrier/snipeit-backup -q)
+IMAGE_SCHEDULER=$(docker images ianharrier/snipeit-scheduler -q)
+IMAGE_WEB=$(docker images ianharrier/snipeit -q)
+docker rmi $IMAGE_BACKUP $IMAGE_SCHEDULER $IMAGE_WEB
+
 echo "=== Building new images. ======================================================="
 docker-compose build --pull
 
