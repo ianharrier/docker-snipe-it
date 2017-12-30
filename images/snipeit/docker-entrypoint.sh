@@ -9,10 +9,6 @@ mkdir -p /var/lib/snipeit/uploads/barcodes
 mkdir -p /var/lib/snipeit/uploads/models
 mkdir -p /var/lib/snipeit/uploads/suppliers
 
-echo "[I] Setting file permissions."
-chgrp -R apache /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads
-chmod -R ug+rwx /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads
-
 if [ ! "$(cat /var/lib/snipeit/app_key 2>/dev/null || echo)" ]; then
     echo "[I] Setting the application key."
     echo "$(php artisan key:generate --show)" > /var/lib/snipeit/app_key
@@ -33,6 +29,10 @@ done
 
 echo "[I] Migrating the database."
 php artisan migrate --force
+
+echo "[I] Setting file permissions."
+chgrp -R apache /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads
+chmod -R ug+rwx /var/lib/snipeit/private_uploads /var/lib/snipeit/uploads
 
 echo "[I] Entrypoint tasks complete. Starting Snipe-IT."
 exec "$@"
