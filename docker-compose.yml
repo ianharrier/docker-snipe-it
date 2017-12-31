@@ -34,7 +34,7 @@ services:
             - IMAGE_LIB=gd
             - APP_TRUSTED_PROXIES=${WEB_APP_TRUSTED_PROXIES}
         volumes:
-            - ./volumes/web/data:/var/lib/snipeit
+            - ./volumes/web/data:/var/lib/snipeit:Z
     db:
         image: mysql
         restart: unless-stopped
@@ -44,7 +44,7 @@ services:
             - MYSQL_USER=${DB_MYSQL_USER}
             - MYSQL_PASSWORD=${DB_MYSQL_PASSWORD}
         volumes:
-            - ./volumes/db/data:/var/lib/mysql
+            - ./volumes/db/data:/var/lib/mysql:Z
     scheduler:
         build:
             context: ./images/scheduler
@@ -62,6 +62,8 @@ services:
         volumes:
             - ./:${PWD}
             - /var/run/docker.sock:/var/run/docker.sock
+        security_opt:
+            - label:disable
     backup:
         build:
             context: ./images/backup
@@ -80,3 +82,5 @@ services:
         volumes:
             - ./:${PWD}
             - /var/run/docker.sock:/var/run/docker.sock
+        security_opt:
+            - label:disable
