@@ -51,7 +51,7 @@ services:
             args:
                 - GLIBC_VERSION=2.27-r0
                 - COMPOSE_VERSION=1.19.0
-        image: ianharrier/snipeit-scheduler:1.0.10
+        image: ianharrier/snipeit-scheduler:1.0.11
         restart: unless-stopped
         environment:
             - LDAP_SYNC_OPERATION=${WEB_LDAP_SYNC_OPERATION}
@@ -70,7 +70,7 @@ services:
             args:
                 - GLIBC_VERSION=2.27-r0
                 - COMPOSE_VERSION=1.19.0
-        image: ianharrier/snipeit-backup:1.0.10
+        image: ianharrier/snipeit-backup:1.0.11
         restart: unless-stopped
         environment:
             - OPERATION=${BACKUP_OPERATION}
