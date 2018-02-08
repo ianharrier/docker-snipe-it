@@ -49,7 +49,7 @@ services:
         build:
             context: ./images/scheduler
             args:
-                - GLIBC_VERSION=2.26-r0
+                - GLIBC_VERSION=2.27-r0
                 - COMPOSE_VERSION=1.18.0
         image: ianharrier/snipeit-scheduler:1.0.10
         restart: unless-stopped
@@ -68,7 +68,7 @@ services:
         build:
             context: ./images/backup
             args:
-                - GLIBC_VERSION=2.26-r0
+                - GLIBC_VERSION=2.27-r0
                 - COMPOSE_VERSION=1.18.0
         image: ianharrier/snipeit-backup:1.0.10
         restart: unless-stopped
