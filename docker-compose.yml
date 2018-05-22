@@ -36,7 +36,7 @@ services:
         volumes:
             - ./volumes/web/data:/var/lib/snipeit:Z
     db:
-        image: mysql
+        image: mysql:5.7
         restart: unless-stopped
         environment:
             - MYSQL_ROOT_PASSWORD=${DB_MYSQL_ROOT_PASSWORD}
