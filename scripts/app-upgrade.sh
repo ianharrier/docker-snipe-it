@@ -27,7 +27,7 @@ echo "=== Updating environment file. ===========================================
 OLD_SNIPEIT_VERSION=$(grep ^SNIPEIT_VERSION= .env | cut -d = -f 2)
 NEW_SNIPEIT_VERSION=$(grep ^SNIPEIT_VERSION= .env.template | cut -d = -f 2)
 echo "[I] Upgrading Snipe-IT from '$OLD_SNIPEIT_VERSION' to '$NEW_SNIPEIT_VERSION'."
-sed -i.bak "s/^SNIPEIT_VERSION=.*/SNIPEIT_VERSION=$NEW_SNIPEIT_VERSION/g" .env
+sed -i.bak -e "s/^SNIPEIT_VERSION=.*/SNIPEIT_VERSION=$NEW_SNIPEIT_VERSION/g" .env
 
 echo "=== Deleting old images. ======================================================="
 IMAGE_BACKUP=$(docker images ianharrier/snipeit-backup -q)
