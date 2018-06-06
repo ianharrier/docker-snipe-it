@@ -50,8 +50,8 @@ docker-compose up -d db &>/dev/null
 echo "[I] Waiting for MySQL container to complete initialization tasks."
 DB_READY=false
 while [ "$DB_READY" = "false" ]; do
-    sleep 1
     nc -z db 3306 &>/dev/null && DB_READY=true || DB_READY=false
+	sleep 5
 done
 
 echo "[I] Restoring MySQL database."
