@@ -64,23 +64,19 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         security_opt:
             - label:disable
-    backup:
+    cron:
         build:
-            context: ./images/backup
-            args:
-                - GLIBC_VERSION=2.27-r0
-                - COMPOSE_VERSION=1.21.2
-        image: ianharrier/snipeit-backup:1.0.12
+            context: ./images/cron
+        image: ianharrier/snipeit-cron:1.1.0
         restart: unless-stopped
         environment:
-            - OPERATION=${BACKUP_OPERATION}
-            - CRON_EXP=${BACKUP_CRON_EXP}
-            - RETENTION=${BACKUP_RETENTION}
+            - BACKUP_OPERATION=${BACKUP_OPERATION}
+            - BACKUP_CRON_EXP=${BACKUP_CRON_EXP}
+            - BACKUP_RETENTION=${BACKUP_RETENTION}
             - HOST_PATH=${PWD}
-            - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
             - TIMEZONE=${TIMEZONE}
+            - MYSQL_DATABASE=${DB_MYSQL_DATABASE}
+            - MYSQL_USER=${DB_MYSQL_USER}
+            - MYSQL_PASSWORD=${DB_MYSQL_PASSWORD}
         volumes:
-            - ./:${PWD}
-            - /var/run/docker.sock:/var/run/docker.sock
-        security_opt:
-            - label:disable
+            - ./:${PWD}:z

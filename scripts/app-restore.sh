@@ -3,11 +3,15 @@ set -e
 
 START_TIME=$(date +%s)
 
-cd "$HOST_PATH"
+if [ ! -d .git ]; then
+    echo "[E] This script needs to run from the top directory of the repo. Current working directory:"
+    echo "      $(pwd)"
+    exit 1
+fi
 
 if [ ! $1 ]; then
     echo "[E] Specify the name of a backup file to restore. Example:"
-    echo "      docker-compose exec backup app-restore 20170501T031500+0000.tar.gz"
+    echo "      $0 20170501T031500+0000.tar.gz"
     exit 1
 fi
 
@@ -26,17 +30,8 @@ BACKUP_FILE="$1"
 echo "[I] Creating working directory."
 mkdir -p backups/tmp_restore
 
-echo "[I] Shutting down and removing scheduler container."
-docker-compose stop scheduler &>/dev/null
-docker-compose rm --force scheduler &>/dev/null
-
-echo "[I] Shutting down and removing Snipe-IT container."
-docker-compose stop web &>/dev/null
-docker-compose rm --force web &>/dev/null
-
-echo "[I] Shutting down and removing MySQL container."
-docker-compose stop db &>/dev/null
-docker-compose rm --force db &>/dev/null
+echo "[I] Shutting down and removing application stack."
+docker-compose down &>/dev/null
 
 echo "[I] Removing Snipe-IT and MySQL persistent data."
 rm -rf volumes/web/data volumes/db/data
@@ -48,10 +43,8 @@ echo "[I] Creating and starting MySQL container."
 docker-compose up -d db &>/dev/null
 
 echo "[I] Waiting for MySQL container to complete initialization tasks."
-DB_READY=false
-while [ "$DB_READY" = "false" ]; do
-    nc -z db 3306 &>/dev/null && DB_READY=true || DB_READY=false
-	sleep 5
+until (docker-compose logs db | grep "MySQL init process done") &>/dev/null; do
+    sleep 5
 done
 
 echo "[I] Restoring MySQL database."
@@ -63,11 +56,8 @@ if [ ! -d volumes/web ]; then
 fi
 mv backups/tmp_restore/data volumes/web/data/
 
-echo "[I] Creating and starting Snipe-IT container."
-docker-compose up -d web &>/dev/null
-
-echo "[I] Creating and starting scheduler container."
-docker-compose up -d scheduler &>/dev/null
+echo "[I] Creating and starting application stack."
+docker-compose up -d &>/dev/null
 
 echo "[I] Removing working directory."
 rm -rf backups/tmp_restore

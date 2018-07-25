@@ -8,7 +8,7 @@ if [ "$TIMEZONE" ]; then
 fi
 
 echo "[I] Creating cron job."
-echo "$CRON_EXP /usr/local/bin/app-backup" > /var/spool/cron/crontabs/root
+echo "$BACKUP_CRON_EXP /usr/local/bin/app-backup" > /var/spool/cron/crontabs/root
 
 echo "[I] Entrypoint tasks complete. Starting crond."
 exec "$@"
