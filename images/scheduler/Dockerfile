@@ -19,7 +19,7 @@ RUN set -ex \
                curl \
         && curl --location \
                --output /etc/apk/keys/sgerrand.rsa.pub \
-               https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub \
+               https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
         && curl --location \
                --output /tmp/glibc-"${GLIBC_VERSION}".apk \
                https://github.com/sgerrand/alpine-pkg-glibc/releases/download/"${GLIBC_VERSION}"/glibc-"${GLIBC_VERSION}".apk \
