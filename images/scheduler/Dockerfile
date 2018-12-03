@@ -51,15 +51,13 @@ RUN set -ex \
 #  Scripts
 #-------------------------------------------------------------------------------
 
-RUN set -ex \
-        && apk --no-cache add \
-               tzdata
-
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY laravel-schedule.sh /usr/local/bin/laravel-schedule
 COPY snipeit-ldap-sync.sh /usr/local/bin/snipeit-ldap-sync
 
 RUN set -ex \
+        && apk --no-cache add \
+               tzdata \
         && chmod +x /usr/local/bin/docker-entrypoint \
         && chmod +x /usr/local/bin/laravel-schedule \
         && chmod +x /usr/local/bin/snipeit-ldap-sync
