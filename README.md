@@ -1,3 +1,13 @@
+# WARNING - repo is not maintained
+
+**PLEASE DO NOT USE THIS REPOSITORY IN PRODUCTION.**
+
+This repository is no longer maintained and has been archived. It is being left public for archival and educational purposes.
+
+---
+---
+---
+
 # docker-snipe-it
 
 Dockerized Snipe-IT
